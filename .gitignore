@@ -1,3 +1,9 @@
+## Assets.
+ckpt/
+data/
+logs/
+result/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
