@@ -38,7 +38,7 @@ def define_argparser():
     p.add_argument(
         "--model_type",
         type=str,
-        default="veri", ## or "veri"
+        default="iden", ## or "veri"
         choices=["iden", "veri"],
         help="Default=%(default)s",
     )
@@ -51,7 +51,7 @@ def define_argparser():
     p.add_argument(
         "--train_model",
         type=bool,
-        default=True, ## True
+        default=False, ## True
         help="Default=%(default)s",
     )
     p.add_argument(
@@ -500,16 +500,8 @@ def get_prediction(config, latest_model: tf.keras.Model, ts_ds: tf.data.Dataset,
 
     ## Save the results.
     if save:
-        assets = get_assets()
-        assets.update({
-            "y_true": y_true, 
-            "y_pred": y_pred, 
-            "model_type": config.model_type,
-            "ds_type": "fixed",
-            "attack_type": None,
-            "epsilon": None,
-            "dB_x_delta": None,
-        })
+        assets = get_assets(model_type=config.model_type, ds_type="fixed", attack_type=None, epsilon=None)
+        assets.update({"y_true": y_true, "y_pred": y_pred, "dB_x_delta": None})
         save_npz(assets, save_dir=config.result_path)
 
     return y_true, y_pred

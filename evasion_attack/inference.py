@@ -16,7 +16,7 @@ class InferenceIdentificationModel():
         y_true = []
         y_pred = []
 
-        desc = f"Evaluate {latest_model.name}"
+        desc = f"Inference {latest_model.name}"
         for element in tqdm(ts_ds, total=total, desc=desc):
             ## Unpack.
             inp, tar = element
@@ -40,7 +40,7 @@ class InferenceIdentificationModel():
         y_true = []
         y_pred = []
 
-        desc = f"Evaluate {latest_model.name}"
+        desc = f"Inference {latest_model.name}"
         for element in tqdm(ts_ds, total=total, desc=desc):
             ## Unpack.
             inp, tar = element
@@ -68,7 +68,7 @@ class InferenceVerificationModel():
         y_true = []
         y_pred = []
 
-        desc = f"Evaluate {latest_model.name}"
+        desc = f"Inference {latest_model.name}"
         for element in tqdm(ts_ds, total=total, desc=desc):
             ## Unpack.
             inp_1, inp_2, tar = element
@@ -101,7 +101,7 @@ class InferenceVerificationModel():
         y_true = []
         y_pred = []
 
-        desc = f"Evaluate {latest_model.name}"
+        desc = f"Inference {latest_model.name}"
         for element in tqdm(ts_ds, total=total, desc=desc):
             ## Unpack.
             inp_1, inp_2, tar = element

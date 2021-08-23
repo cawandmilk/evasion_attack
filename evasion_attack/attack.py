@@ -19,10 +19,10 @@ def get_assets(model_type: str, ds_type: str, attack_type: str, epsilon: float):
     if not (ds_type in ["random", "fixed"]):
         raise AssertionError(f"Argument 'ds_type' must be 'random' or 'fixed': not {ds_type}")
 
-    if not (attack_type in ["fgm", "pgd"]):
+    if not (attack_type in [None, "fgm", "pgd"]):
         raise AssertionError(f"Argument 'attack_type' must be 'fgm' or 'pgd': not {attack_type}")
 
-    if not (epsilon in [1e-1, 1e-2, 1e-3]):
+    if not (epsilon in [None, 1e-1, 1e-2, 1e-3]):
         raise AssertionError(f"Argument 'epsilon' must be 1e-1, 1e-2, or 1e-3: not {epsilon}")
 
     return {
