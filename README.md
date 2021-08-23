@@ -1,6 +1,8 @@
-# Evasion attack
+<!DOCTYPE html5>
 
-## Abstract
+# **Evasion attack**
+
+## **Abstract**
 
 본 저장소는 제5회 금융보안원 논문공모전에 출품한 논문 "**목소리를 이용한 심층신경망 기반 생체인증 시스템에의 회피 공격**: 정성적 평가의 수행 및 교차 검증에 대한 절제연구를 중심으로"의 실험 과정 및 결과 재현을 위한 자료입니다. 당해 저장소의 주요 목적은 아래와 같습니다.
 
@@ -9,11 +11,11 @@
 
 모든 코드는 최초에 작성되었던 `*.ipynb` 확장자의 파일들을 `*.py` 형태로 리팩토링하였기 때문에, 실험 결과가 완전히 명확하게 재현되지 않을 수 있습니다. 따라서 본 저장소에서는 재현성을 위해 사전에 훈련된 식별 및 검증 모델에 대한 체크포인트 가중치를 같이 제공하고 있으며, 이를 이용하여 별도의 모델 훈련과정 없이 적대적 공격과 관련한 코드를 실행시키는 것을 권장드립니다.
 
-## Prepare Checkpoints
+## **Prepare Checkpoints**
 
 dd
 
-## Requirements
+## **Requirements**
 
 본 실험은 `Linux Ubuntu 20.04`에서 진행되었습니다. 실험 과정 및 결과에 중대한 영향을 미칠 수 있는 주요 라이브러리의 버전은 아래와 같습니다.
 
@@ -30,7 +32,7 @@ cleverhans==4.0.0
 pip install -r requirement.txt
 ```
 
-## Prepare Dataset
+## **Prepare Dataset**
 
 본 저장소에는 `VoxCeleb1` 데이터세트를 다운로드하는 코드가 의도적으로 누락되어 있습니다. 따라서 <a href="https://www.robots.ox.ac.uk/~vgg/data/voxceleb/" target="_blank">`VoxCeleb`</a>를 참고하셔서 필요한 데이터를 다운받으시고, 해쉬값을 검사하신 뒤 병합까지 진행하셔야 합니다. 모든 데이터는 폴더 `./data`에 위치해야 하며, 아래 초기 상태에 맞게 데이터가 준비된 상태를 권장합니다.
 
@@ -44,7 +46,7 @@ data
 0 directories, 4 files
 ```
 
-## Generate TFRecords
+## **Generate TFRecords**
 
 10만개 이상의 파일을 매 에폭마다 참조하는 것은 입출력 오버헤드가 매우 크기 때문에, 효율적인 입출력 파이프라인 관리를 위해 5000개씩 음성 발화를 묶은 이진 바이트 형태의 레코드 파일 `TFRecordDataset (*.tfrec)`을 사전에 준비합니다. 이에 대한 추가적인 설명은 <a href="https://www.tensorflow.org/tutorials/load_data/tfrecord" target="_blank">`TensorFlow Tutorial`</a>을 참고하시기 바랍니다.
 
@@ -54,7 +56,7 @@ python ./preliminary.py
 
 세부적인 파라미터는 <a href="./config/preliminary.json" target="_blank">`./config/preliminary.json`</a>을 참고 바랍니다.
 
-## Train, Inference, and Evaluate
+## **Train, Inference, and Evaluate**
 
 훈련, 추론 및 평가 과정은 한번에 이루어집니다. 아래와 같은 명령어를 통해 파라미터를 제어하여 훈련을 진행할 수 있습니다.
 
@@ -96,7 +98,7 @@ python ./preliminary.py
 
 * Verification: EER, AUROC, minDCF
 
-## Adversarial Attack
+## **Adversarial Attack**
 
 적대적 공격에 관한 실험은 진행하는데 오랜 시간이 소요되기 떄문에, 자체 서버를 활용하여 오랜 시간 코드를 실행하시거나 Jupyter Lab 등의 환경을 이용하여 단계별로 진행하시는 것을 권장합니다.
 
