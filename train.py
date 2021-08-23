@@ -1,11 +1,11 @@
 import tensorflow as tf
 
 import argparse
-import datetime
 import pprint
 
 import numpy as np
 
+from collections import OrderedDict
 from pathlib import Path
 
 from evasion_attack.attack import get_assets, save_npz
@@ -38,7 +38,7 @@ def define_argparser():
     p.add_argument(
         "--model_type",
         type=str,
-        default="iden", ## or "veri"
+        default="veri", ## or "veri"
         choices=["iden", "veri"],
         help="Default=%(default)s",
     )
@@ -51,7 +51,7 @@ def define_argparser():
     p.add_argument(
         "--train_model",
         type=bool,
-        default=False, ## True
+        default=True, ## True
         help="Default=%(default)s",
     )
     p.add_argument(
@@ -88,17 +88,24 @@ def define_argparser():
     )
 
     p.add_argument(
+        "--tfrec_folder",
+        type=str,
+        default=str(Path(p.parse_args().data_path, "tfrecord")),
+        help="Default=%(default)s",
+    )
+    p.add_argument(
         "--iden_tfrec_folder",
         type=str,
-        default=str(Path(p.parse_args().data_path, "tfrecord", "iden")),
+        default=str(Path(p.parse_args().tfrec_folder, "iden")),
         help="Default=%(default)s",
     )
     p.add_argument(
         "--veri_tfrec_folder",
         type=str,
-        default=str(Path(p.parse_args().data_path, "tfrecord", "veri")),
+        default=str(Path(p.parse_args().tfrec_folder, "veri")),
         help="Default=%(default)s",
     )
+
 
     p.add_argument(
         "--ckpt_dir",
@@ -173,6 +180,18 @@ def define_argparser():
         default=512,
         help="Default=%(default)s",
     )
+    p.add_argument(
+        "--iden_model_name",
+        type=str,
+        default="AngularPrototypicalModel-Identification",
+        help="Default=%(default)s",
+    )
+    p.add_argument(
+        "--veri_model_name",
+        type=str,
+        default="AngularPrototypicalModel-Verification",
+        help="Default=%(default)s",
+    )
 
     ## Training hyper-parameters.
     p.add_argument(
@@ -243,6 +262,22 @@ def define_argparser():
         "--num_veri_ts_ds",
         type=int,
         default=37_720,
+        help="Default=%(default)s",
+    )
+
+    ## Adversarial attack.
+    p.add_argument(
+        "--attack_type",
+        type=str,
+        nargs="+",
+        default=["fgm", "pgd"],
+        help="Default=%(default)s",
+    )
+    p.add_argument(
+        "--epsilon",
+        type=float,
+        nargs="+",
+        default=[1e-1, 1e-2, 1e-3],
         help="Default=%(default)s",
     )
 
@@ -358,12 +393,9 @@ def build_model(config):
     sample_rate_ms = int(config.sample_rate / 1_000)
     num_classes = config.num_classes_for_iden if config.model_type.lower() == "iden" else config.num_classes_for_veri
 
-    assert config.model_type in ["iden", "veri"]
-    if config.model_type == "iden":
-        config.model_name = "AngularPrototypicalModel-Identification"
-    else:
-        config.model_name = "AngularPrototypicalModel-Verification"
-    config.model_name = f"{config.model_name}-{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    ## Naming.
+    if config.model_name == None:
+        config.model_name = config.iden_model_name if config.model_type == "iden" else config.veri_model_name
 
     ## Define the parts.
     header = Preprocessing(
@@ -487,21 +519,22 @@ def get_evaluation(config, y_true: np.ndarray, y_pred: np.ndarray):
     """ Do evaluate performance.
     """
     if config.model_type.lower() == "iden":
-        cmc = EvaluateIdentificationModel.CMC(y_true, y_pred)
-        print(f"Top-1 accuracy: {cmc[0]:.4f}, Top-5 accuracy: {cmc[4]:.4f}")
+        foo = EvaluateIdentificationModel.cmc(y_true, y_pred)
+        print(f"Top-1 accuracy: {foo[0]:.4f}, Top-5 accuracy: {foo[4]:.4f}")
 
     else:
-        eer = EvaluateVerificationModel.EER(y_true, y_pred)
-        auroc = EvaluateVerificationModel.AUROC(y_true, y_pred)
-        mindcf = EvaluateVerificationModel.minDCF(y_true, y_pred)
-        print(f"EER: {eer:.2f}, AUROC: {auroc:.4f}, minDCF: {mindcf:.4f}")
+        foo = EvaluateVerificationModel.eer(y_true, y_pred)
+        bar = EvaluateVerificationModel.auroc(y_true, y_pred)
+        qux = EvaluateVerificationModel.min_dcf(y_true, y_pred)
+        print(f"EER: {foo:.2f}, AUROC: {bar:.4f}, minDCF: {qux:.4f}")
 
 
 def main(config):
     """ Main body.
     """
     def print_config(config):
-        pprint.PrettyPrinter(indent=4).pprint(vars(config))
+        ## 'sort_dicts=False' params can only apply python>=3.8.
+        pprint.PrettyPrinter(indent=4).pprint(OrderedDict(vars(config)))
     print_config(config)
 
     ## Set gpu memory growthable.
@@ -525,6 +558,7 @@ def main(config):
         model.compile(
             ## Custom arguments.
             ds=tr_ds,
+            loss_fn=tf.keras.metrics.Mean(name="loss"),
             metric_fn=tf.keras.metrics.SparseCategoricalAccuracy(name="acc"),
             ## Original arguments.
             optimizer=Optimizers.get_adabelief_optimizer(
@@ -554,7 +588,7 @@ def main(config):
     get_evaluation(config, y_true, y_pred)
 
     ## Save configuration.
-    save_config(vars(config))
+    save_config(vars(config), file_path=Path("config", "train.json"))
 
 
 if __name__ == "__main__":

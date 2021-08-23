@@ -17,7 +17,7 @@ class EvaluateIdentificationModel():
 
 
     @staticmethod
-    def CMC(y_true: np.ndarray, y_pred: np.ndarray):
+    def cmc(y_true: np.ndarray, y_pred: np.ndarray):
         """ Calculate Cumulative Match Characteristic (CMC) curve, 
             i.e. top-1 ~ top-{len(y_true)} accuracy.
         """
@@ -33,7 +33,7 @@ class EvaluateIdentificationModel():
 class EvaluateVerificationModel():
 
     @staticmethod
-    def EER(y_true: np.ndarray, y_pred: np.ndarray, positive_label: int = 1):
+    def eer(y_true: np.ndarray, y_pred: np.ndarray, positive_label: int = 1):
         """ Calculate equal erro rate (EER).
 
             It was referenced from:
@@ -55,7 +55,7 @@ class EvaluateVerificationModel():
 
 
     @staticmethod
-    def AUROC(y_true: np.ndarray, y_pred: np.ndarray, positive_label: int = 1):
+    def auroc(y_true: np.ndarray, y_pred: np.ndarray, positive_label: int = 1):
         """ Compute Area Under the ROC Curve (AUROC).
         """
         ## All fpr, tpr, fnr, fnr, threshold are lists (in the format of np.array).
@@ -66,7 +66,7 @@ class EvaluateVerificationModel():
 
 
     @staticmethod
-    def minDCF(y_true: np.ndarray, y_pred: np.ndarray, positive_label: int = 1, p_target: float = 0.05, c_miss: float = 1., c_fa: float = 1.):
+    def min_dcf(y_true: np.ndarray, y_pred: np.ndarray, positive_label: int = 1, p_target: float = 0.05, c_miss: float = 1., c_fa: float = 1.):
         """ Minimum Detection Cost Function (minDCF) implementation.
 
             It was referenced from:

@@ -31,21 +31,20 @@ class Centroids(tf.keras.metrics.Metric):
 
     def update_state(self, y_true: tf.Tensor, y_pred: tf.Tensor, adapting: bool = False):
         """ Update untrainable weights.
-
              - y_true.shape: (batch_size,)
              - y_pred.shape: (batch_size, embedding_dim) = (batch_size, 512)
         """
         y_true = tf.cast(y_true, dtype=tf.int64)
 
         ## Get one-hot variables.
-        ##  - one_hot_y_true.shape: (batch_size, num_classes) = (batch_size, 1_251)
-        ##  - one_hot_y_pred.shape: (batch_size, embedding_dim, num_classes) = (batch_size, 512, 1_251)
+        ##  - one_hot_y_true.shape: (batch_size, num_classes) ~= (batch_size, 1_251)
+        ##  - one_hot_y_pred.shape: (batch_size, embedding_dim, num_classes) ~= (batch_size, 512, 1_251)
         one_hot_y_true = tf.one_hot(y_true, depth=self.num_classes, dtype=y_pred.dtype)
         one_hot_y_pred = tf.einsum("ij,ik->ijk", y_pred, one_hot_y_true)
 
         ## Squeeze batch dimension.
-        ##  - y_true_sum.shape: (num_classes,) = (1_251,)
-        ##  - y_pred_sum.shape: (embedding_dim, num_classes) = (512, 1_251)
+        ##  - y_true_sum.shape: (num_classes,) ~= (1_251,)
+        ##  - y_pred_sum.shape: (embedding_dim, num_classes) ~= (512, 1_251)
         y_true_sum = tf.math.reduce_sum(one_hot_y_true, axis=0)
         y_pred_sum = tf.math.reduce_sum(one_hot_y_pred, axis=0)
 

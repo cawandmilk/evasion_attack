@@ -39,7 +39,7 @@ class AttentiveStatisticsPooling(tf.keras.layers.Layer):
 
     def call(self, x: tf.Tensor, training: bool = None):
         """ Callable body.
-             - input.shape:  (batch_size, time, frames)
+             - input.shape:  (batch_size, time_step, frames)
              - output.shape: (batch_size, 2 * frames)
         """
         w = self.attention(x, training=training)

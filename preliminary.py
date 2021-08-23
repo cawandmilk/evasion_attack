@@ -1,8 +1,10 @@
 import argparse
 import pprint
+
+from collections import OrderedDict
 from pathlib import Path
 
-from evasion_attack.utils import check_file_exists, unzip
+from evasion_attack.utils import check_file_exists, unzip, save_config
 from evasion_attack.tfrecord import TFRecordGenerator
 
 
@@ -23,44 +25,50 @@ def define_argparser():
     p.add_argument(
         "--data_path",
         type=str,
-        default=str(Path(".", "data")),
+        default="data",
         help="Default=%(default)s",
     )
     p.add_argument(
         "--tr_folder",
         type=str,
-        default=str(Path(".", "data", "vox1_dev_wav", "wav")),
+        default=str(Path(p.parse_args().data_path, "vox1_dev_wav", "wav")),
         help="Default=%(default)s",
     )
     p.add_argument(
         "--ts_folder",
         type=str,
-        default=str(Path(".", "data", "vox1_test_wav", "wav")),
+        default=str(Path(p.parse_args().data_path, "vox1_test_wav", "wav")),
         help="Default=%(default)s",
     )
     p.add_argument(
         "--split_ids",
         type=str,
-        default=str(Path(".", "data", "iden_split.txt")),
+        default=str(Path(p.parse_args().data_path, "iden_split.txt")),
         help="Default=%(default)s",
     )
     p.add_argument(
         "--veri_test",
         type=str,
-        default=str(Path(".", "data", "veri_test.txt")),
+        default=str(Path(p.parse_args().data_path, "veri_test.txt")),
         help="Default=%(default)s",
     )
 
     p.add_argument(
+        "--tfrec_folder",
+        type=str,
+        default=str(Path(p.parse_args().data_path, "tfrecord")),
+        help="Default=%(default)s",
+    )
+    p.add_argument(
         "--iden_tfrec_folder",
         type=str,
-        default=str(Path(".", "data", "tfrecord", "iden")),
+        default=str(Path(p.parse_args().tfrec_folder, "iden")),
         help="Default=%(default)s",
     )
     p.add_argument(
         "--veri_tfrec_folder",
         type=str,
-        default=str(Path(".", "data", "tfrecord", "veri")),
+        default=str(Path(p.parse_args().tfrec_folder, "veri")),
         help="Default=%(default)s",
     )
 
@@ -105,7 +113,7 @@ def main(config):
     """ Main body.
     """
     def print_config(config):
-        pprint.PrettyPrinter(indent=4).pprint(vars(config))
+        pprint.PrettyPrinter(indent=4).pprint(OrderedDict(vars(config)))
     print_config(config)
 
     ## Unzip.
@@ -134,6 +142,9 @@ def main(config):
 
         gen.generate_iden_tfrecords()
         gen.generate_veri_tfrecords()
+
+    ## Save configuation.
+    save_config(vars(config), file_path=Path("config", "preliminary.json"))
 
 
 if __name__ == "__main__":

@@ -45,10 +45,13 @@ class AngularPrototypicalModel(tf.keras.Model):
         self.centroids.divide_and_normalize()
 
 
-    def compile(self, ds: tf.data.Dataset, metric_fn: tf.keras.metrics.Metric, **kwargs):
+    def compile(self, ds: tf.data.Dataset, loss_fn: tf.keras.metrics.Mean, metric_fn: tf.keras.metrics.Metric, **kwargs):
         """ Overwrite 'compile' API.
         """
         super(AngularPrototypicalModel, self).compile(**kwargs)
+        ## loss_fn is introduced to calculate the cumulative average 
+        ## of loss values.
+        self.loss_fn = loss_fn
         self.metric_fn = metric_fn
         ## 'ds is not None' means, 'if it is not inference mode'.
         if ds is not None:
@@ -97,11 +100,10 @@ class AngularPrototypicalModel(tf.keras.Model):
 
         ## Update metrics include 'centroids'.
         self.centroids.update_state(tar, y_pred)
+        self.loss_fn.update_state(loss_value)
         self.metric_fn.update_state(tar, scaled_similarity)
 
-        results = {"loss": loss_value}
-        results.update({self.metric_fn.name: self.metric_fn.result()})
-
+        results = {f.name: f.result() for f in [self.loss_fn, self.metric_fn]}
         return results
 
 
@@ -116,9 +118,8 @@ class AngularPrototypicalModel(tf.keras.Model):
         loss_value = self.compiled_loss(tar, scaled_similarity)
 
         ## Update metrics exclude 'centroids'.
+        self.loss_fn.update_state(loss_value)
         self.metric_fn.update_state(tar, scaled_similarity)
 
-        results = {"loss": loss_value}
-        results.update({self.metric_fn.name: self.metric_fn.result()})
-
+        results = {f.name: f.result() for f in [self.loss_fn, self.metric_fn]}
         return results

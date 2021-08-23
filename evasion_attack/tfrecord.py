@@ -24,7 +24,7 @@ class TFRecordGenerator():
         file_num_per_tfrecord: int = 5_000,
         test_size: float = 0.2,
     ):
-        """Define common params.
+        """ Define common params.
         """
         self.seed = seed
         self.tr_folder = tr_folder
@@ -48,8 +48,8 @@ class TFRecordGenerator():
         Path(self.veri_tfrec_folder).mkdir(parents=True, exist_ok=True)
 
 
-    def _make_full_path(self, path):
-        """Make the path absolute, resolving any symlinks.
+    def _make_full_path(self, path: str):
+        """ Make the path absolute, resolving any symlinks.
         """
         if Path(self.tr_folder, path).exists():
             return Path(self.tr_folder, path)
@@ -60,7 +60,7 @@ class TFRecordGenerator():
 
 
     def _bytes_feature(self, value):
-        """Returns a bytes_list from a string / byte.
+        """ Returns a bytes_list from a string / byte.
         """
         if isinstance(value, type(tf.constant(0))):
             # BytesList won't unpack a string from an EagerTensor.
@@ -68,24 +68,22 @@ class TFRecordGenerator():
         return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
 
-    def _float_feature(self, value):
-        """Returns a float_list from a float / double.
+    def _float_feature(self, value: float):
+        """ Returns a float_list from a float / double.
         """
         return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
 
 
-    def _int64_feature(self, value):
-        """Returns an int64_list from a bool / enum / int / uint.
+    def _int64_feature(self, value: int):
+        """ Returns an int64_list from a bool / enum / int / uint.
         """
         return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
 
 
-    def _iden_audio_example(self, audio_path, label):
-        """Generate audio examples for identification task. (classification)
+    def _iden_audio_example(self, audio_path: str, label: int):
+        """ Generate audio examples for identification task. (classification)
         """
-        if isinstance(audio_path, type(Path("."))):
-            audio_path = str(audio_path)
-
+        ## Read files.
         audio_string = tf.io.read_file(audio_path)
         audio_shape = tf.audio.decode_wav(audio_string).audio.shape[0]
 
@@ -98,14 +96,10 @@ class TFRecordGenerator():
         return tf.train.Example(features=tf.train.Features(feature=feature))
 
 
-    def _veri_audio_example(self, audio_path_1, audio_path_2, y_true):
-        """Generate audio examples for verification task. (similarity)
+    def _veri_audio_example(self, audio_path_1: str, audio_path_2: str, y_true: int):
+        """ Generate audio examples for verification task. (similarity)
         """
-        if isinstance(audio_path_1, type(Path("."))):
-            audio_path_1 = str(audio_path_1)
-        if isinstance(audio_path_2, type(Path("."))):
-            audio_path_2 = str(audio_path_2)
-
+        ## Read files.
         audio_string_1 = tf.io.read_file(audio_path_1)
         audio_shape_1 = tf.audio.decode_wav(audio_string_1).audio.shape[0]
 
@@ -123,14 +117,8 @@ class TFRecordGenerator():
         return tf.train.Example(features=tf.train.Features(feature=feature))
 
 
-    def _make_iden_tfrecords(
-        self,
-        X_path: np.array,
-        Y: np.array,
-        training_type: int,
-        dest: str,
-    ):
-        """Write tfrecords for identification task.
+    def _make_iden_tfrecords(self, X_path: np.ndarray, Y: np.ndarray, training_type: int, dest: str):
+        """ Write tfrecords for identification task.
         """
         tfrecord_num = int(np.ceil(X_path.shape[0] / self.file_num_per_tfrecord))
         prefix = {self.TR_IDS: "tr", self.VL_IDS: "vl", self.TS_IDS: "ts"}[training_type]
@@ -145,22 +133,15 @@ class TFRecordGenerator():
             record_name = Path(dest, f"{prefix}_{i:03d}_{sub_X_path.shape[0]:05d}.tfrec")
             with tf.io.TFRecordWriter(str(record_name)) as writer: ## only allow str-type-path, not Pathlib.
                 for x_path, y in zip(sub_X_path, sub_Y):
-                    tf_example = self._iden_audio_example(x_path, y)
+                    tf_example = self._iden_audio_example(str(x_path), y)
                     writer.write(tf_example.SerializeToString())
 
             ## Delete temporary files to save memory.
             del sub_X_path, sub_Y
 
 
-    def _make_veri_tfrecords(
-        self,
-        X_path_1: np.array,
-        X_path_2: np.array,
-        y_true: np.array,
-        training_type: int,
-        dest: str,
-    ):
-        """Write tfrecords for verification task.
+    def _make_veri_tfrecords(self, X_path_1: np.ndarray, X_path_2: np.ndarray, y_true: np.ndarray, training_type: int, dest: str):
+        """ Write tfrecords for verification task.
         """
         tfrecord_num = int(np.ceil(X_path_1.shape[0] / self.file_num_per_tfrecord)) ## 2_500
         prefix = {self.TR_IDS: "tr", self.VL_IDS: "vl", self.TS_IDS: "ts"}[training_type]
@@ -176,17 +157,15 @@ class TFRecordGenerator():
             record_name = Path(dest, f"{prefix}_{i:03d}_{sub_X_path_1.shape[0]:05d}.tfrec")
             with tf.io.TFRecordWriter(str(record_name)) as writer: ## only allow str-type-path, not Pathlib.
                 for x_path_1, x_path_2, y in zip(sub_X_path_1, sub_X_path_2, sub_y_true):
-                    tf_example = self._veri_audio_example(x_path_1, x_path_2, y)
+                    tf_example = self._veri_audio_example(str(x_path_1), str(x_path_2), y)
                     writer.write(tf_example.SerializeToString())
         
             ## Delete temporary files to save memory.
             del sub_X_path_1, sub_X_path_2, sub_y_true
 
 
-    def generate_iden_tfrecords(
-        self,
-    ):
-        """Generate tfrecords for identification task.
+    def generate_iden_tfrecords(self):
+        """ Generate tfrecords for identification task.
         """
         ## Load split ids.
         ids = pd.read_csv(self.split_ids, sep=" ", header=None, names=["training_type", "path"])
@@ -233,10 +212,8 @@ class TFRecordGenerator():
         self._make_iden_tfrecords(ts_X_path, ts_Y, self.TS_IDS, dest=self.iden_tfrec_folder)
 
 
-    def generate_veri_tfrecords(
-        self,
-    ):
-        """Generate tfrecords for verification task.
+    def generate_veri_tfrecords(self):
+        """ Generate tfrecords for verification task.
         """
         ## First, we generate shuffled training and validation dataset.
         tot_X_path = np.array(sorted([i for i in Path(self.tr_folder).glob("*/*/*.wav")]))

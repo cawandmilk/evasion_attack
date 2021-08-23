@@ -1,0 +1,16 @@
+{
+    "seed": 42,
+    "data_path": "data",
+    "tr_folder": "data/vox1_dev_wav/wav",
+    "ts_folder": "data/vox1_test_wav/wav",
+    "split_ids": "data/iden_split.txt",
+    "veri_test": "data/veri_test.txt",
+    "tfrec_folder": "data/tfrecord",
+    "iden_tfrec_folder": "data/tfrecord/iden",
+    "veri_tfrec_folder": "data/tfrecord/veri",
+    "unzip": false,
+    "generate_tfrecords": true,
+    "file_num_per_tfrecord": 5000,
+    "num_classes_for_iden": 1251,
+    "num_classes_for_veri": 1211
+}

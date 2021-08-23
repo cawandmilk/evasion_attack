@@ -1,0 +1,7 @@
+data
+├── [4.7M]  iden_split.txt
+├── [2.2M]  veri_test.txt
+├── [ 30G]  vox1_dev_wav.zip
+└── [1023M]  vox1_test_wav.zip
+
+0 directories, 4 files
