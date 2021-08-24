@@ -250,7 +250,7 @@ class TFRecordGenerator():
         print(f"  # of tr_X_path: {tr_X_path.shape[0]:>6}, tr_Y: {tr_Y.shape[0]:>6d}")
         print(f"  # of vl_X_path: {vl_X_path.shape[0]:>6}, vl_Y: {vl_Y.shape[0]:>6d}")
         print(f"  # of ts_X_path: {ts_X_path_1.shape[0]:>6}, " + \
-                f"unique ts_X_path: {np.unique(np.concatenate([ts_X_path_1, ts_X_path_2], axis=0)).shape[0]:>6}")
+                f"unique ts_X_path: {np.unique(np.concatenate([ts_X_path_1, ts_X_path_2], axis=0)).shape[0]}")
 
         ## Generate tfrecords for identificaiton task, not verification.
         self._make_iden_tfrecords(tr_X_path, tr_Y, self.TR_IDS, dest=self.veri_tfrec_folder)

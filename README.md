@@ -28,6 +28,8 @@ cleverhans==4.0.0
 
 ```console
 pip install -r requirement.txt
+pip uninstall tensorflow ## remove auto-installed tensorflow (cpu version)
+pip install tensorflow-gpu==2.5.0
 ```
 
 ## **Prepare Dataset**

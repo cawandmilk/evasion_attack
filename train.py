@@ -181,7 +181,7 @@ def define_argparser():
     config.__setattr__("num_veri_ts_ds", 37_720)
 
     config.__setattr__("attack_type", ["fgm", "pgd"])
-    config.__setattr__("epsilon", [1e-1, 1e-2, 1e-3])
+    config.__setattr__("epsilon", [1e-3, 1e-2, 1e-1])
 
     return config
 
