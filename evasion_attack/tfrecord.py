@@ -230,14 +230,10 @@ class TFRecordGenerator():
         ## Next, split the total dataset into training and validation.
         num_tr = int(np.ceil(len(tot_X_path) * (1. - self.test_size)))
 
-        tr_X_path, tr_Y = tot_X_path[:num_tr], tot_Y[:num_tr]
-        vl_X_path, vl_Y = tot_X_path[num_tr:], tot_Y[num_tr:]
+        tr_X_path, tr_Y = np.array(tot_X_path[:num_tr]), np.array(tot_Y[:num_tr])
+        vl_X_path, vl_Y = np.array(tot_X_path[num_tr:]), np.array(tot_Y[num_tr:])
 
         assert np.all([len(np.unique(label)) == self.num_classes_for_veri for label in [tr_Y, vl_Y]])
-
-        ## Generate tfrecords for identificaiton task, not verification.
-        self._make_iden_tfrecords(tr_X_path, tr_Y, self.TR_IDS, dest=self.veri_tfrec_folder)
-        self._make_iden_tfrecords(vl_X_path, vl_Y, self.VL_IDS, dest=self.veri_tfrec_folder)
 
         ## Now we can take verification pairs.
         ids = pd.read_csv(self.veri_test, sep=" ", header=None, names=["y_true", "path_1", "path_2"])
@@ -249,5 +245,15 @@ class TFRecordGenerator():
         ts_X_path_1 = ids["path_1"].values
         ts_X_path_2 = ids["path_2"].values
 
+        ## Print the shapes.
+        print("Assets of verification files:")
+        print(f"  # of tr_X_path: {tr_X_path.shape[0]:>6}, tr_Y: {tr_Y.shape[0]:>6d}")
+        print(f"  # of vl_X_path: {vl_X_path.shape[0]:>6}, vl_Y: {vl_Y.shape[0]:>6d}")
+        print(f"  # of ts_X_path: {ts_X_path_1.shape[0]:>6}, " + \
+                f"unique ts_X_path: {np.unique(np.concatenate([ts_X_path_1, ts_X_path_2], axis=0)).shape[0]:>6}")
+
+        ## Generate tfrecords for identificaiton task, not verification.
+        self._make_iden_tfrecords(tr_X_path, tr_Y, self.TR_IDS, dest=self.veri_tfrec_folder)
+        self._make_iden_tfrecords(vl_X_path, vl_Y, self.VL_IDS, dest=self.veri_tfrec_folder)
         ## Generate tfrecords for verification task, not identificaiton.
         self._make_veri_tfrecords(ts_X_path_1, ts_X_path_2, y_true, self.TS_IDS, dest=self.veri_tfrec_folder)

@@ -1,5 +1,3 @@
-<!DOCTYPE html5>
-
 # **Evasion attack**
 
 ## **Abstract**
@@ -34,7 +32,7 @@ pip install -r requirement.txt
 
 ## **Prepare Dataset**
 
-본 저장소에는 `VoxCeleb1` 데이터세트를 다운로드하는 코드가 의도적으로 누락되어 있습니다. 따라서 <a href="https://www.robots.ox.ac.uk/~vgg/data/voxceleb/" target="_blank">`VoxCeleb`</a>를 참고하셔서 필요한 데이터를 다운받으시고, 해쉬값을 검사하신 뒤 병합까지 진행하셔야 합니다. 모든 데이터는 폴더 `./data`에 위치해야 하며, 아래 초기 상태에 맞게 데이터가 준비된 상태를 권장합니다.
+본 저장소에는 `VoxCeleb1` 데이터세트를 다운로드하는 코드가 의도적으로 누락되어 있습니다. 따라서 <a href="https://www.robots.ox.ac.uk/~vgg/data/voxceleb/">`VoxCeleb`</a>를 참고하셔서 필요한 데이터를 다운받으시고, 해쉬값을 검사하신 뒤 병합까지 진행하셔야 합니다. 모든 데이터는 폴더 `./data`에 위치해야 하며, 아래 초기 상태에 맞게 데이터가 준비된 상태를 권장합니다.
 
 ```console
 data
@@ -48,13 +46,13 @@ data
 
 ## **Generate TFRecords**
 
-10만개 이상의 파일을 매 에폭마다 참조하는 것은 입출력 오버헤드가 매우 크기 때문에, 효율적인 입출력 파이프라인 관리를 위해 5000개씩 음성 발화를 묶은 이진 바이트 형태의 레코드 파일 `TFRecordDataset (*.tfrec)`을 사전에 준비합니다. 이에 대한 추가적인 설명은 <a href="https://www.tensorflow.org/tutorials/load_data/tfrecord" target="_blank">`TensorFlow Tutorial`</a>을 참고하시기 바랍니다.
+10만개 이상의 파일을 매 에폭마다 참조하는 것은 입출력 오버헤드가 매우 크기 때문에, 효율적인 입출력 파이프라인 관리를 위해 5000개씩 음성 발화를 묶은 이진 바이트 형태의 레코드 파일 `TFRecordDataset (*.tfrec)`을 사전에 준비합니다. 이에 대한 추가적인 설명은 <a href="https://www.tensorflow.org/tutorials/load_data/tfrecord">`TensorFlow Tutorial`</a>을 참고하시기 바랍니다.
 
 ```console
-python ./preliminary.py
+python ./preliminary.py --unzip --generate_tfrecords
 ```
 
-세부적인 파라미터는 <a href="./config/preliminary.json" target="_blank">`./config/preliminary.json`</a>을 참고 바랍니다.
+세부적인 파라미터는 <a href="./config/preliminary.json">`./config/preliminary.json`</a>을 참고 바랍니다.
 
 ## **Train, Inference, and Evaluate**
 
@@ -63,20 +61,20 @@ python ./preliminary.py
 * Idenfitication Phase:
 
     ```console
-    python ./train.py --model_type iden --train_model True --epochs 80 --batch_size 64
+    python ./train.py --model_type iden --train_model --epochs 80 --batch_size 64
     ```
 
 * Verification Phase:
 
     ```console
-    python ./train.py --model_type veri --train_model True --epochs 80 --batch_size 64
+    python ./train.py --model_type veri --train_model --epochs 80 --batch_size 64
     ```
 
-세부적인 파라미터는 <a href="./config/train.json" target="_blank">`./config/train.json`</a>을 참고 바랍니다.
+세부적인 파라미터는 <a href="./config/train.json">`./config/train.json`</a>을 참고 바랍니다.
 
 훈련은 NVIDIA RTX 3070 GPU (computing capicity=8.6) 기준, identification model은 약 10시간 50분, verification model은 약 10시간 15분이 소요되었습니다. 전체 데이터의 개수는 동일하지만, Training/Validation 데이터 분할 비율이 다르기 때문에 얼마간의 훈련 시간 차이가 존재합니다.
 
-<a href="https://www.tensorflow.org/guide/mixed_precision?hl=ko" target="_blank">`Mixed Precision`</a>를 적용한다면 훈련 속도가 훨씬 단축될것으로 예상되지만, 일부 가중치(`AngularPrototypicalModel.w`, `AngularPrototypicalModel.b`)의 발산 문제로 인해 적용하지 못했습니다. 구체적으로 `AngularPrototypical.w`는 양의 방향으로, `AngularPrototypical.b`는 음의 방향으로 커지는 현상이 발생하였습니다.
+<a href="https://www.tensorflow.org/guide/mixed_precision?hl=ko">`Mixed Precision`</a>을 적용한다면 훈련 속도가 훨씬 단축될것으로 예상되지만, 일부 가중치(`AngularPrototypicalModel.w`, `AngularPrototypicalModel.b`)의 발산 문제로 인해 적용하지 못했습니다. 구체적으로 `AngularPrototypical.w`는 양의 방향으로, `AngularPrototypical.b`는 음의 방향으로 커지는 현상이 발생하였습니다.
 
 훈련 결과는 아래와 같습니다.
 
@@ -88,7 +86,7 @@ python ./preliminary.py
 
     ![veri_result](./assets/veri_result.png)
 
-모든 훈련 결과는 <a href="https://tensorboard.dev/experiment/1ZK5m6GiQrKdOeUOiJM0Dw" target="_blank">`Tensorboard.Dev`</a>에 공개적으로 커밋(Commit)하였습니다.
+모든 훈련 결과는 <a href="https://tensorboard.dev/experiment/1ZK5m6GiQrKdOeUOiJM0Dw">`Tensorboard.Dev`</a>에 공개적으로 커밋(Commit)하였습니다.
 
 추론(Inference)은 주어진 모델과 그에 맞는 데이터세트로부터 `y_true` 및 `y_pred`를 계산하는 과정입니다. 이는 `*.npz` 포맷으로 자동 저장됩니다.
 
@@ -104,4 +102,4 @@ python ./preliminary.py
 
 본 단계에서는 클라우드 컨테이너 개발 환경인 `Google Colab (Pro)`의 Jupyter Lab에서 다중 세션을 활용하여 실험을 진행했으며, `Colab`에서는 Tesla P100 (또는 V100) GPU와 12GB RAM이 제공됩니다.
 
-적대적 공격은 <a href="https://github.com/cleverhans-lab/cleverhans" target="_blank">`CleverHans`</a>에 구현되어 있는 FGSM 및 PGD 공격을 참조하였습니다.
+적대적 공격은 <a href="https://github.com/cleverhans-lab/cleverhans">`CleverHans`</a>에 구현되어 있는 FGSM 및 PGD 공격을 참조하였습니다.

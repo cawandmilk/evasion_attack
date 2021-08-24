@@ -49,21 +49,22 @@ def define_argparser():
         help="Default=%(default)s",
     )
     p.add_argument(
-        "--train_model",
-        type=bool,
-        default=False, ## True
-        help="Default=%(default)s",
+        "--train_model", 
+        dest="train_model", 
+        action="store_true",
+    )
+    p.add_argument(
+        "--no-train_model", 
+        dest="train_model", 
+        action="store_false",
+    )
+    p.set_defaults(
+        train_model=True
     )
     p.add_argument(
         "--clear_assets",
         type=bool,
         default=True,
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--sample_rate",
-        type=int,
-        default=16_000,
         help="Default=%(default)s",
     )
 
@@ -74,86 +75,8 @@ def define_argparser():
         default="data",
         help="Default=%(default)s",
     )
-    p.add_argument(
-        "--tr_folder",
-        type=str,
-        default=str(Path(p.parse_args().data_path, "vox1_dev_wav", "wav")),
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--ts_folder",
-        type=str,
-        default=str(Path(p.parse_args().data_path, "vox1_test_wav", "wav")),
-        help="Default=%(default)s",
-    )
-
-    p.add_argument(
-        "--tfrec_folder",
-        type=str,
-        default=str(Path(p.parse_args().data_path, "tfrecord")),
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--iden_tfrec_folder",
-        type=str,
-        default=str(Path(p.parse_args().tfrec_folder, "iden")),
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--veri_tfrec_folder",
-        type=str,
-        default=str(Path(p.parse_args().tfrec_folder, "veri")),
-        help="Default=%(default)s",
-    )
-
-
-    p.add_argument(
-        "--ckpt_dir",
-        type=str,
-        default="ckpt",
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--log_dir",
-        type=str,
-        default="logs",
-        help="Default=%(default)s",
-    )
-
-    p.add_argument(
-        "--result_path",
-        type=str,
-        default="result",
-        help="Default=%(default)s",
-    )
-
-    ## TFRecords..
-    p.add_argument(
-        "--file_num_per_tfrecord",
-        type=int,
-        default=5_000,
-        help="Default=%(default)s",
-    )
 
     ## TFRecord Dataset.
-    p.add_argument(
-        "--slice_len_sec",
-        type=int,
-        default=2,  # slice_len = slice_len_sec * sample_rate
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--num_slice",
-        type=int,
-        default=10,
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--buffer_size",
-        type=int,
-        default=150_000,
-        help="Default=%(default)s",
-    )
     p.add_argument(
         "--global_batch_size",
         type=int,
@@ -163,33 +86,9 @@ def define_argparser():
 
     ## Modeling.
     p.add_argument(
-        "--num_classes_for_iden",
-        type=int,
-        default=1_251,
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--num_classes_for_veri",
-        type=int,
-        default=1_211,
-        help="Default=%(default)s",
-    )
-    p.add_argument(
         "--embedding_dim",
         type=int,
         default=512,
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--iden_model_name",
-        type=str,
-        default="AngularPrototypicalModel-Identification",
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--veri_model_name",
-        type=str,
-        default="AngularPrototypicalModel-Verification",
         help="Default=%(default)s",
     )
 
@@ -251,37 +150,38 @@ def define_argparser():
         help="Default=%(default)s",
     )
 
-    ## Inference.
-    p.add_argument(
-        "--num_iden_ts_ds",
-        type=int,
-        default=8_251,
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--num_veri_ts_ds",
-        type=int,
-        default=37_720,
-        help="Default=%(default)s",
-    )
-
-    ## Adversarial attack.
-    p.add_argument(
-        "--attack_type",
-        type=str,
-        nargs="+",
-        default=["fgm", "pgd"],
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--epsilon",
-        type=float,
-        nargs="+",
-        default=[1e-1, 1e-2, 1e-3],
-        help="Default=%(default)s",
-    )
-
     config = p.parse_args()
+
+    ## Add additional arguments.
+    config.__setattr__("sample_rate", 16_000)
+    config.__setattr__("slice_len_sec", 2)
+    config.__setattr__("slice_len", config.sample_rate * config.slice_len_sec)
+    config.__setattr__("num_slice", 10)
+
+    config.__setattr__("buffer_size", 150_000)
+
+    config.__setattr__("tr_folder", str(Path(config.data_path, "vox1_dev_wav", "wav")))
+    config.__setattr__("ts_folder", str(Path(config.data_path, "vox1_test_wav", "wav")))
+
+    config.__setattr__("tfrec_folder", str(Path(config.data_path, "tfrecord")))
+    config.__setattr__("iden_tfrec_folder", str(Path(config.tfrec_folder, "iden")))
+    config.__setattr__("veri_tfrec_folder", str(Path(config.tfrec_folder, "veri")))
+
+    config.__setattr__("ckpt_dir", "ckpt")
+    config.__setattr__("log_dir", "logs")
+    config.__setattr__("result_path", "result")
+
+    config.__setattr__("num_classes_for_iden", 1_251)
+    config.__setattr__("num_classes_for_veri", 1_211)
+
+    config.__setattr__("iden_model_name", "AngularPrototypicalModel-Identification")
+    config.__setattr__("veri_model_name", "AngularPrototypicalModel-Verification")
+
+    config.__setattr__("num_iden_ts_ds", 8_251)
+    config.__setattr__("num_veri_ts_ds", 37_720)
+
+    config.__setattr__("attack_type", ["fgm", "pgd"])
+    config.__setattr__("epsilon", [1e-1, 1e-2, 1e-3])
 
     return config
 

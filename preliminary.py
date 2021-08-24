@@ -28,62 +28,33 @@ def define_argparser():
         default="data",
         help="Default=%(default)s",
     )
-    p.add_argument(
-        "--tr_folder",
-        type=str,
-        default=str(Path(p.parse_args().data_path, "vox1_dev_wav", "wav")),
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--ts_folder",
-        type=str,
-        default=str(Path(p.parse_args().data_path, "vox1_test_wav", "wav")),
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--split_ids",
-        type=str,
-        default=str(Path(p.parse_args().data_path, "iden_split.txt")),
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--veri_test",
-        type=str,
-        default=str(Path(p.parse_args().data_path, "veri_test.txt")),
-        help="Default=%(default)s",
-    )
-
-    p.add_argument(
-        "--tfrec_folder",
-        type=str,
-        default=str(Path(p.parse_args().data_path, "tfrecord")),
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--iden_tfrec_folder",
-        type=str,
-        default=str(Path(p.parse_args().tfrec_folder, "iden")),
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--veri_tfrec_folder",
-        type=str,
-        default=str(Path(p.parse_args().tfrec_folder, "veri")),
-        help="Default=%(default)s",
-    )
 
     ## Params.
     p.add_argument(
-        "--unzip",
-        type=bool,
-        default=False,  # True
-        help="Default=%(default)s",
+        "--unzip", 
+        dest="unzip", 
+        action="store_true",
     )
     p.add_argument(
-        "--generate_tfrecords",
-        type=bool,
-        default=True,  # True
-        help="Default=%(default)s",
+        "--no-unzip", 
+        dest="unzip", 
+        action="store_false",
+    )
+    p.set_defaults(
+        unzip=True
+    )
+    p.add_argument(
+        "--generate_tfrecords", 
+        dest="generate_tfrecords", 
+        action="store_true",
+    )
+    p.add_argument(
+        "--no-generate_tfrecords", 
+        dest="generate_tfrecords", 
+        action="store_false",
+    )
+    p.set_defaults(
+        generate_tfrecords=True
     )
     p.add_argument(
         "--file_num_per_tfrecord",
@@ -91,20 +62,21 @@ def define_argparser():
         default=5_000,
         help="Default=%(default)s",
     )
-    p.add_argument(
-        "--num_classes_for_iden",
-        type=int,
-        default=1_251,
-        help="Default=%(default)s",
-    )
-    p.add_argument(
-        "--num_classes_for_veri",
-        type=int,
-        default=1_211,
-        help="Default=%(default)s",
-    )
 
     config = p.parse_args()
+
+    ## Add some arguments.
+    config.__setattr__("tr_folder", str(Path(config.data_path, "vox1_dev_wav", "wav")))
+    config.__setattr__("ts_folder", str(Path(config.data_path, "vox1_test_wav", "wav")))
+    config.__setattr__("split_ids", str(Path(config.data_path, "iden_split.txt")))
+    config.__setattr__("veri_test", str(Path(config.data_path, "veri_test.txt")))
+
+    config.__setattr__("tfrec_folder", str(Path(config.data_path, "tfrecord")))
+    config.__setattr__("iden_tfrec_folder", str(Path(config.tfrec_folder, "iden")))
+    config.__setattr__("veri_tfrec_folder", str(Path(config.tfrec_folder, "veri")))
+
+    config.__setattr__("num_classes_for_iden", 1_251)
+    config.__setattr__("num_classes_for_veri", 1_211)
 
     return config
 
