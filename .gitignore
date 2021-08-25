@@ -4,6 +4,9 @@ data/
 logs/
 result/
 
+## But keep the folder by keeping .gitkeep file
+!data/.gitkeep
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
