@@ -40,13 +40,13 @@ def define_argparser():
         type=str,
         default="iden", ## or "veri"
         choices=["iden", "veri"],
-        help="Default=%(default)s",
+        help="The type of model you want to train (iden or veri).Default=%(default)s",
     )
     p.add_argument(
         "--model_name",
         type=str,
         default=None,
-        help="Default=%(default)s",
+        help="The model name. Default=%(default)s",
     )
     p.add_argument(
         "--train_model", 
@@ -65,7 +65,7 @@ def define_argparser():
         "--clear_assets",
         type=bool,
         default=True,
-        help="Default=%(default)s",
+        help="Whether to initialize existing checkpoints and log records. Default=%(default)s",
     )
 
     ## Path.
@@ -73,7 +73,7 @@ def define_argparser():
         "--data_path",
         type=str,
         default="data",
-        help="Default=%(default)s",
+        help="Folder where initial data is stored. Default=%(default)s",
     )
 
     ## TFRecord Dataset.
@@ -81,7 +81,7 @@ def define_argparser():
         "--global_batch_size",
         type=int,
         default=64,
-        help="Default=%(default)s",
+        help="The size of each mini-batch. Default=%(default)s",
     )
 
     ## Modeling.
@@ -89,7 +89,7 @@ def define_argparser():
         "--embedding_dim",
         type=int,
         default=512,
-        help="Default=%(default)s",
+        help="Demensions of embedded features. Default=%(default)s",
     )
 
     ## Training hyper-parameters.
@@ -97,31 +97,31 @@ def define_argparser():
         "--epochs",
         type=int,
         default=80, ## 80
-        help="Default=%(default)s",
+        help="The number of epochs you want to train with. Default=%(default)s",
     )
     p.add_argument(
         "--init_lr",
         type=float,
         default=1e-3,
-        help="Default=%(default)s",
+        help="Initial learning rate. Warm-up does not proceed. Default=%(default)s",
     )
     p.add_argument(
         "--alpha",
         type=float,
         default=1./20, ## min_lr = lr * alpha = 5e-5
-        help="Default=%(default)s",
+        help="The coefficient that determines the minimum learning rate. min_lr = init_lr * alpha. Default=%(default)s",
     )
     p.add_argument(
         "--rectify",
         type=bool,
         default=True,
-        help="Default=%(default)s",
+        help="Whether to apply rectify in optimizer. Default=%(default)s",
     )
     p.add_argument(
         "--weight_decay",
         type=float,
         default=5e-4,
-        help="Default=%(default)s",
+        help="Size of weight decay. Default=%(default)s",
     )
 
     ## Callbacks.
@@ -129,25 +129,25 @@ def define_argparser():
         "--checkpoint_callback",
         type=bool,
         default=True,
-        help="Default=%(default)s",
+        help="Whether to save checkpoints. Default=%(default)s",
     )
     p.add_argument(
         "--tensorboard_callback",
         type=bool,
         default=True,
-        help="Default=%(default)s",
+        help="Whether to log for tensorboard visualizations. Default=%(default)s",
     )
     p.add_argument(
         "--learning_rate_schedular_callback",
         type=bool,
         default=True,
-        help="Default=%(default)s",
+        help="Whether to apply a callback for adjusting the learning rate schedular. Default=%(default)s",
     )
     p.add_argument(
         "--csv_logger_callback",
         type=bool,
         default=True,
-        help="Default=%(default)s",
+        help="Whether to leave log records in csv format. Default=%(default)s",
     )
 
     config = p.parse_args()

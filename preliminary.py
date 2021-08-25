@@ -26,7 +26,7 @@ def define_argparser():
         "--data_path",
         type=str,
         default="data",
-        help="Default=%(default)s",
+        help="Folder where initial data is stored. Default=%(default)s",
     )
 
     ## Params.
@@ -60,7 +60,7 @@ def define_argparser():
         "--file_num_per_tfrecord",
         type=int,
         default=5_000,
-        help="Default=%(default)s",
+        help="Maximum number of utterances to be saved in one '*.tfrec' file. Default=%(default)s",
     )
 
     config = p.parse_args()
