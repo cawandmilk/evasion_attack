@@ -13,7 +13,7 @@
 
 본 실험은 `Linux Ubuntu 20.04`에서 진행되었습니다. 실험 과정 및 결과에 중대한 영향을 미칠 수 있는 주요 라이브러리의 버전은 아래와 같습니다.
 
-```console
+```
 python==3.7.10
 tensorflow-gpu==2.5.0
 tensorflow-addons==0.13.0
@@ -22,7 +22,7 @@ cleverhans==4.0.0
 
 이를 포함한 라이브러리는 아래와 같이 설치할 수 있습니다.
 
-```console
+```
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
@@ -38,7 +38,7 @@ pip install -r requirements.txt
 
 본 저장소에는 `VoxCeleb1` 데이터세트를 다운로드하는 코드가 포함되어 있지 않습니다. 따라서 <a href="https://www.robots.ox.ac.uk/~vgg/data/voxceleb/">`VoxCeleb`</a>를 참고하셔서 필요한 데이터를 다운 및 병합하셔야 합니다. 모든 데이터는 폴더 `./data`에 위치해야 하며, 아래 초기 상태에 맞게 데이터가 준비된 상태를 권장합니다.
 
-```console
+```
 data
 ├── [4.7M]  iden_split.txt
 ├── [2.2M]  veri_test.txt
@@ -52,7 +52,7 @@ data
 
 10만개 이상의 파일을 매 에폭마다 참조하는 것은 입출력 오버헤드가 매우 크기 때문에, 효율적인 입출력 파이프라인 관리를 위해 5000개씩 음성 발화를 묶은 이진 바이트 형태의 레코드 파일 `TFRecordDataset (*.tfrec)`을 사전에 준비합니다. 이에 대한 추가적인 설명은 <a href="https://www.tensorflow.org/tutorials/load_data/tfrecord">`TensorFlow Tutorial`</a>을 참고하시기 바랍니다.
 
-```console
+```
 python ./preliminary.py --unzip --generate_tfrecords
 ```
 
@@ -68,13 +68,13 @@ python ./preliminary.py --unzip --generate_tfrecords
 
 * Idenfitication Phase:
 
-    ```console
+    ```
     python ./train.py --model_type iden --train_model --epochs 80 --batch_size 64
     ```
 
 * Verification Phase:
 
-    ```console
+    ```
     python ./train.py --model_type veri --train_model --epochs 80 --batch_size 64
     ```
 
@@ -102,7 +102,7 @@ python ./preliminary.py --unzip --generate_tfrecords
 
 평가(Evaluate)는 `y_true` 및 `y_pred` 텐서에 기반해서 평가를 수행하는 과정입니다. 식별, 검증 모델에 따른 구현된 평가 내용은 아래와 같습니다.
 
-* Common: $\text{dB}_x \left( \delta \right)$
+* Common: $$\text{dB}_x \left( \delta \right)$$
 
 * Identification: Top-1 Accuracy, Top-5 Accuracy (based on CMC Curve)
 
